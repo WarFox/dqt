@@ -1,0 +1,29 @@
+#+title: Dimensions of data quality
+
+1. Completeness - data is complete not partially available
+2. Accuracy - accurate phone number, birth date etc - needs reference to source of truth
+3. Consistency - same dimensions used in multiple instances refer to the same thing
+4. Validity - valid phone number, valid date of birth
+5. Uniqueness - Ensure no duplicates
+6. Integrity - Relationships different and related data is maintained through out the data journey.
+   Should be traceble throught the org. Customer address -> Customer Profile
+7. Accessibility - is data accessible, searchable etc
+8. Timeliness - freshness - is data available when you need it?
+9. Relevance - What data is used to support business initiatives?
+
+Data consumers must define what’s most important and creators must focus on delivering that most important data.
+
+https://www.collibra.com/blog/the-6-dimensions-of-data-quality
+
+
+| Name          | Source based | Regex based | Destination based | Time based |
+|---------------+--------------+-------------+-------------------+------------|
+| Completeness  | yes          |             | yes               |            |
+| Accuracy      | no           | yes         |                   |            |
+| Consistency   | yes          | yes         | yes               | yes        |
+| Validity      | no           | yes         |                   |            |
+| Uniqueness    | yes          | no          |                   |            |
+| Integrity     | yse          | no          | yes               |            |
+| Accessibility | ?            | ?           | ?                 | ?          |
+| Timeliness    |              |             |                   | yes        |
+| Relevance     |              |             |                   |            |
