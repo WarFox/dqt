@@ -2,6 +2,10 @@
 
 A simple data quality tool. Collect and publish metrics about quality of data anywhere.
 
+* Docs
+
+1. [[./docs/dimensions.org][Dimensions of data quality]]
+
 * Features [0/10]
 
 - [ ] publish metrics to aws
