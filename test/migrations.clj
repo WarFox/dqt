@@ -1,12 +1,12 @@
 (ns migrations
   (:require [migratus.core :as migratus]
-            [dqt.config :as c]))
+            [dqt.config :as config]))
 
 (defn migrate
   []
-  (migratus/init c/config)
-  (migratus/migrate c/config))
+  (migratus/init config/migratus)
+  (migratus/migrate config/migratus))
 
 (defn rollback
   []
-  (migratus/rollback c/config))
+  (migratus/rollback config/migratus))

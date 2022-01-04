@@ -20,6 +20,9 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
 
     steps:
       - name: Checkout
@@ -36,22 +39,12 @@ jobs:
         with:
           cli: 1.10.3.1040
 
-      - name: Test on Linux and MacOS
-        if: ${{ matrix.os != 'windows-latest' }}
+      - name: Test
         run: clojure -T:build test
         shell: bash
+        env:
+          DATABASE_HOSTNAME: localhost
 
-      - name: Test on Windows
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: clojure -T:build test
-        shell: powershell
-
-      - name: Uberjar on Linux and MacOS
-        if: ${{ matrix.os != 'windows-latest' }}
+      - name: Uberjar
         run: clojure -T:build uberjar
         shell: bash
-
-      - name: Uberjar on Windows
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: clojure -T:build uberjar
-        shell: powershell
