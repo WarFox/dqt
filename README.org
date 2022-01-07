@@ -2,6 +2,10 @@
 
 A simple data quality tool. Collect and publish metrics about quality of data anywhere.
 
+* Docs
+
+1. [[./docs/dimensions.org][Dimensions of data quality]]
+
 * Features [0/10]
 
 - [ ] publish metrics to aws
@@ -90,6 +94,17 @@ FIXME: listing of options this app accepts.
 
 ...
 
+* Development
+
+** Test database
+
+Run =docker compose up= to have postgress running
+
+** Run test
+
+#+begin_src
+  > clj -T:build test
+#+end_src
 
 * License
 
