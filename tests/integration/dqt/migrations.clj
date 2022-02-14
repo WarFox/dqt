@@ -1,4 +1,4 @@
-(ns migrations
+(ns dqt.migrations
   (:require [migratus.core :as migratus]
             [dqt.config :as config]))
 
