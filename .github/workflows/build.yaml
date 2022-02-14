@@ -40,6 +40,9 @@ jobs:
         with:
           cli: 1.10.3.1040
 
+      - name: cljfmt-check
+        run: clojure -M:format/cljfmt-check
+
       - name: Test
         run: clojure -T:build test
         shell: bash
