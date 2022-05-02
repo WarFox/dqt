@@ -6,7 +6,7 @@ A simple data quality tool. Collect and publish metrics about quality of data an
 
 1. [[./docs/dimensions.org][Dimensions of data quality]]
 
-* Features [0/10]
+* Features [0/11]
 
 - [ ] publish metrics to aws
 - [ ] publish metrics to prometheus
@@ -17,7 +17,7 @@ A simple data quality tool. Collect and publish metrics about quality of data an
 - [ ] multiple data sources
 - [ ] example dag with airflow
 - [ ] example with prefect
-
+- [ ] re-conciliation between two data sources, % missing, matching columns vs mismatch
 
 * Installation
 
@@ -67,7 +67,6 @@ Run the project's CI pipeline and build an uberjar (this will fail until you edi
 #+begin_src
     $ clojure -T:build ci
 #+end_src
-
 
 This will produce an updated =pom.xml= file with synchronized dependencies inside the =META-INF=
 directory inside =target/classes= and the uberjar in =target=. You can update the version (and SCM tag)
