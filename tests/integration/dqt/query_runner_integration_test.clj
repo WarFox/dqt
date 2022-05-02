@@ -1,17 +1,11 @@
 (ns dqt.query-runner-integration-test
   (:require [clojure.test :refer :all]
-            [dqt.query-runner :as sut]
+            [dqt.config :as config]
+            [dqt.fixtures :as f]
             [dqt.migrations :as m]
-            [dqt.config :as config]))
+            [dqt.query-runner :as sut]))
 
-(defn db-setup
-  [f]
-  (m/migrate)
-  (f)
-  (m/rollback))
-
-(use-fixtures
-  :once db-setup)
+(use-fixtures :once f/run-migrations)
 
 (deftest query-runner-test
   (is (= '({:count 40}) (sut/count* config/db :employees))))

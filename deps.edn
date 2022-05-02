@@ -1,11 +1,16 @@
-{:paths ["src" "resources"]
+;; -*- comment-column: 80; -*-
+{:deps
 
- :deps
- {org.clojure/clojure {:mvn/version "1.10.3"}
-  org.clojure/tools.cli {:mvn/version "1.0.206"}
-  migratus/migratus {:mvn/version "1.3.5"}
+ ;; alphabetical ordered
+ {aero/aero {:mvn/version "1.1.6"}
   com.github.seancorfield/honeysql {:mvn/version "2.2.840"}
-  com.github.seancorfield/next.jdbc {:mvn/version "1.2.761"}}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.2.761"}
+  migratus/migratus {:mvn/version "1.3.5"}
+  org.clojure/clojure {:mvn/version "1.10.3"}
+  org.clojure/tools.cli {:mvn/version "1.0.206"}
+  org.postgresql/postgresql {:mvn/version "42.2.2"}}
+
+ :paths ["src" "resources"]
 
  :aliases
  ;; clojure -M:run
@@ -23,8 +28,7 @@
   ;; clojure -M:test
   :test
   {:extra-paths ["tests/integration", "tests/unit"]
-   :extra-deps {lambdaisland/kaocha {:mvn/version "1.62.993"}
-                org.postgresql/postgresql {:mvn/version "42.2.2"}}
+   :extra-deps {lambdaisland/kaocha {:mvn/version "1.62.993"}}
    :main-opts   ["-m" "kaocha.runner"]}
 
   ;; clojure -M:format/cljfmt-check
@@ -36,5 +40,5 @@
   :format/cljfmt-fix
   {:extra-deps {cljfmt/cljfmt {:mvn/version "0.8.0"}}
    :main-opts  ["-m" "cljfmt.main" "fix"]}
-
-}}
+ ;; END
+ }}
