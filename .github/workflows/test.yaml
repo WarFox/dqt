@@ -47,7 +47,7 @@ jobs:
         run: clojure -M:format/cljfmt-check
 
       - name: Test
-        run: clojure -T:build test
+        run: ./bin/kaocha
         shell: bash
         env:
           DATABASE_HOSTNAME: localhost
