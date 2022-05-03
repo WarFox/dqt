@@ -1,10 +1,13 @@
-name: Build
+name: Test
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+    - 'docs/**'
 
 jobs:
 
-  build:
+  test:
 
     runs-on: ubuntu-latest
 
@@ -48,7 +51,3 @@ jobs:
         shell: bash
         env:
           DATABASE_HOSTNAME: localhost
-
-      - name: Uberjar
-        run: clojure -T:build uberjar
-        shell: bash
