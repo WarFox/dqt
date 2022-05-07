@@ -3,7 +3,7 @@
 
 (defn -as
   [expr column-name]
-  (keyword (str (name column-name) "-" (name expr))))
+  (keyword (format "%s-%s" (name expr) (name column-name))))
 
 (defn- -row-count
   [column-name]
