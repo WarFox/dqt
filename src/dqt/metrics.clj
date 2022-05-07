@@ -42,7 +42,7 @@
    :values-percentage  identity
    :variance           identity})
 
-(defn- build-expr
+(defn- apply-expr
   [selected-metrics metric]
   (let [expr (selected-metrics metric)]
     (expr :column-name)))
@@ -51,7 +51,7 @@
   [metrics]
   (let [selected-metrics (select-keys supported-metrics metrics)]
     ;; TODO select-distinct if distinct
-    {:select (mapv #(build-expr selected-metrics %) metrics)}))
+    {:select (mapv #(apply-expr selected-metrics %) metrics)}))
 
 (defn format-sql
   [metrics table-name]

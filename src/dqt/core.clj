@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [aero.core :refer (read-config)]
             [dqt.cli :as cli]
+            [dqt.information-schema :as info-schema]
             [dqt.metrics :as m]
             [dqt.query-runner :as q]
             [next.jdbc :as jdbc]))
@@ -14,7 +15,8 @@
   [parsed-options]
   (let [{:keys [action options]} parsed-options
         [datastore table] (load-inputs ((juxt :datastore :table) options))]
-    (println (m/format-sql (:metrics table) (:table-name table)))))
+    (println (info-schema/get-column-metadata (:table-name table) datastore))
+    (println (m/format-sql (:metrics table) (:table-name  table)))))
 
 (defn -main
   "I don't do a whole lot ... yet."
