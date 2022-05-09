@@ -14,9 +14,13 @@
 (defn process
   [parsed-options]
   (let [{:keys [action options]} parsed-options
-        [datastore table] (load-inputs ((juxt :datastore :table) options))]
-    (println (info-schema/get-column-metadata (:table-name table) datastore))
-    (println (m/format-sql (:metrics table) (:table-name  table)))))
+        [datastore table]        (load-inputs ((juxt :datastore :table) options))
+        [table-name metrics]     ((juxt :table-name :metrics) table)
+        column-metadata          (info-schema/get-column-metadata table-name datastore)]
+    ;; validate metrics
+    (println (mapv m/enrich-column-metadata column-metadata))
+    (println (m/format-sql metrics table-name))))
+
 
 (defn -main
   "I don't do a whole lot ... yet."

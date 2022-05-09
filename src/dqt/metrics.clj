@@ -1,5 +1,6 @@
 (ns dqt.metrics
-  (:require [honey.sql :as honey]))
+  (:require [clojure.string :as str]
+            [honey.sql :as honey]))
 
 (defn -as
   [expr column-name]
@@ -42,19 +43,32 @@
    :values-percentage  identity
    :variance           identity})
 
+(def data-type-metrics
+  {:integer           [:avg :min :max]
+   :numeric           [:avg :min :max]
+   :character-varying [:avg-length]
+   :string            [:avg-length]})
+
 (defn- apply-expr
   [selected-metrics metric]
   (let [expr (selected-metrics metric)]
     (expr :column-name)))
 
-(defn build-select-map
+(defn get-select-map
+  "Returns honeysql map for selecting columns "
   [metrics]
   (let [selected-metrics (select-keys supported-metrics metrics)]
     ;; TODO select-distinct if distinct
     {:select (mapv #(apply-expr selected-metrics %) metrics)}))
 
+(defn enrich-column-metadata
+  "Enrich with metrics for given column based on data_type"
+  [column]
+  (let [data-type (-> (:columns/data_type column) (str/replace " " "-") keyword)]
+    (merge column {:metrics (data-type data-type-metrics)})))
+
 (defn format-sql
   [metrics table-name]
-  (-> (build-select-map metrics)
+  (-> (get-select-map metrics)
       (merge {:from table-name})
       honey/format))
