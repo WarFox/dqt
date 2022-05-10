@@ -1,6 +1,6 @@
 (ns dqt.information-schema
-  (:require [honey.sql :as honey]
-            [next.jdbc :as jdbc]))
+  (:require [dqt.query-runner :as q]
+            [honey.sql :as honey]))
 
 (defn column-metadata
   [table-name]
@@ -12,4 +12,4 @@
   [table-name db]
   (->> (column-metadata table-name)
        honey/format
-       (jdbc/execute! db)))
+       (q/execute! db)))

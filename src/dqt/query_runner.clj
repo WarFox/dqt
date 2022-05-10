@@ -1,5 +1,8 @@
 (ns dqt.query-runner
-  (:require [honey.sql :as honey]
-            [honey.sql.helpers :as helpers]
-            [next.jdbc :as jdbc]
-            [next.jdbc.sql :as sql]))
+  (:require [next.jdbc :as jdbc]))
+
+(defn execute!
+  ([db query]
+   (execute! db query {}))
+  ([db query opts]
+   (jdbc/execute! db query opts)))

@@ -4,8 +4,7 @@
             [dqt.cli :as cli]
             [dqt.information-schema :as info-schema]
             [dqt.metrics :as m]
-            [dqt.query-runner :as q]
-            [next.jdbc :as jdbc]))
+            [dqt.query-runner :as q]))
 
 (defn load-inputs
   [[datastore table]]
@@ -20,7 +19,6 @@
     ;; validate metrics
     (println (mapv m/enrich-column-metadata columns-metadata))
     (println (m/format-sql metrics table-name))))
-
 
 (defn -main
   "I don't do a whole lot ... yet."
