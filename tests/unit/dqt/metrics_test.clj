@@ -12,5 +12,5 @@
          (sut/format-sql [:row-count] :table-name))))
 
 (deftest enrich-column-metadata-test
-  (is (= #:columns{:data_type "integer" :metrics [:avg :min :max]}
-         (sut/enrich-column-metadata #:columns{:data_type "integer"}))))
+  (is (= #:columns{:data-type :integer :metrics [:avg :min :max]}
+         (sut/enrich-column-metadata #:columns{:data-type :integer}))))

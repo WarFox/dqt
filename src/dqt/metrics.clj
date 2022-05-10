@@ -64,7 +64,7 @@
 (defn enrich-column-metadata
   "Enrich with metrics for given column based on data_type"
   [column]
-  (let [data-type (-> (:columns/data_type column) (str/replace " " "-") keyword)]
+  (let [data-type (:columns/data-type column)]
     (assoc column :columns/metrics (data-type data-type-metrics))))
 
 (defn format-sql

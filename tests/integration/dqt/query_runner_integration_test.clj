@@ -8,4 +8,5 @@
 (use-fixtures :once f/run-migrations)
 
 (deftest query-runner-test
-  (is (= '({:count 40}) (sut/count* config/db :employees))))
+  (is (= '({:count 40}) (sut/execute! config/db {:select [[:%count.*]]
+                                                 :from   :employees}))))
