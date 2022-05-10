@@ -10,3 +10,7 @@
 (deftest format-sql-test
   (is (= ["SELECT COUNT(column_name) AS count_column_name FROM table_name"]
          (sut/format-sql [:row-count] :table-name))))
+
+(deftest enrich-column-metadata-test
+  (is (= #:columns{:data_type "integer" :metrics [:avg :min :max]}
+         (sut/enrich-column-metadata #:columns{:data_type "integer"}))))

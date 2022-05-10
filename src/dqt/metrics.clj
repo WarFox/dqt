@@ -65,7 +65,7 @@
   "Enrich with metrics for given column based on data_type"
   [column]
   (let [data-type (-> (:columns/data_type column) (str/replace " " "-") keyword)]
-    (merge column {:metrics (data-type data-type-metrics)})))
+    (assoc column :columns/metrics (data-type data-type-metrics))))
 
 (defn format-sql
   [metrics table-name]

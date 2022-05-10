@@ -8,7 +8,7 @@
    :from   :information_schema.columns
    :where  [:= :table-name (name table-name)]})
 
-(defn get-column-metadata
+(defn get-columns-metadata
   [table-name db]
   (->> (column-metadata table-name)
        honey/format

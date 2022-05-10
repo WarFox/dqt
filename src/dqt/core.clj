@@ -16,9 +16,9 @@
   (let [{:keys [action options]} parsed-options
         [datastore table]        (load-inputs ((juxt :datastore :table) options))
         [table-name metrics]     ((juxt :table-name :metrics) table)
-        column-metadata          (info-schema/get-column-metadata table-name datastore)]
+        columns-metadata          (info-schema/get-columns-metadata table-name datastore)]
     ;; validate metrics
-    (println (mapv m/enrich-column-metadata column-metadata))
+    (println (mapv m/enrich-column-metadata columns-metadata))
     (println (m/format-sql metrics table-name))))
 
 
