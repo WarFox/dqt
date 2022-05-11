@@ -1,6 +1,8 @@
 (ns dqt.metrics
   (:require [clojure.string :as str]
-            [honey.sql :as honey]))
+            [honey.sql :as honey]
+            [dqt.query-runner :as q]
+            [dqt.information-schema :as info-schema]))
 
 (defn -as
   [expr column-name]
@@ -50,25 +52,27 @@
    :string            [:avg-length]})
 
 (defn- apply-expr
-  [selected-metrics metric]
-  (let [expr (selected-metrics metric)]
-    (expr :column-name)))
+  [selected-metrics {:keys [columns/metrics columns/column-name] :as column}]
+  (mapv #((selected-metrics %) column-name) metrics))
 
 (defn get-select-map
-  "Returns honeysql map for selecting columns "
-  [metrics]
+  "Returns honeysql map for selecting columns"
+  [columns metrics]
+  (println columns)
   (let [selected-metrics (select-keys supported-metrics metrics)]
     ;; TODO select-distinct if distinct
-    {:select (mapv #(apply-expr selected-metrics %) metrics)}))
+    {:select (apply concat (mapv #(apply-expr selected-metrics %) columns))}))
 
 (defn enrich-column-metadata
   "Enrich with metrics for given column based on data_type"
-  [column]
-  (let [data-type (:columns/data-type column)]
-    (assoc column :columns/metrics (data-type data-type-metrics))))
+  [{:keys [columns/data-type] :as column}]
+  (assoc column
+         :columns/metrics (data-type data-type-metrics)))
 
-(defn format-sql
-  [metrics table-name]
-  (-> (get-select-map metrics)
-      (merge {:from table-name})
-      honey/format))
+(defn get-metrics
+  [db table-name metrics]
+  (let [columns          (info-schema/get-columns-metadata db table-name)
+        enriched-columns (mapv enrich-column-metadata columns)
+        query            (-> (get-select-map enriched-columns metrics)
+                             (assoc :from table-name))]
+    (q/execute! db query)))

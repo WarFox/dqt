@@ -8,5 +8,7 @@
   ([db query]
    (execute! db query {}))
   ([db query opts]
-   (jdbc/execute! db (honey/format query)
-                  (assoc opts :builder-fn rs/as-kebab-maps))))
+   (let [formatted-query (honey/format query)]
+     (println formatted-query)
+     (jdbc/execute! db formatted-query
+                    (assoc opts :builder-fn rs/as-kebab-maps)))))
