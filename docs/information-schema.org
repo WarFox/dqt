@@ -1,0 +1,25 @@
+#+title: Information Schema
+
+Information Schema provides metadata about the database entities
+
+* Column Metadata
+
+1. postgres
+
+#+begin_src sql
+  SELECT column_name, data_type, is_nullable
+  FROM information_schema.columns
+  WHERE lower(table_name) = '{table_name}'
+    AND table_catalog = '{database}'"
+    AND table_schema = '{schema}'"
+#+end_src
+
+
+2. mysql
+
+#+begin_src sql
+  SELECT column_name, data_type, is_nullable
+    FROM information_schema.columns
+   WHERE lower(table_name) = '{table_name}'
+     AND table_schema = '{database}'"
+#+end_src

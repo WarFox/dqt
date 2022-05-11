@@ -1,12 +1,14 @@
 (ns dqt.query-runner
   (:require [honey.sql :as honey]
-            [honey.sql.helpers :as helpers]
             [next.jdbc :as jdbc]
-            [dqt.queries :as q]
-            [next.jdbc.sql :as sql]))
+            [next.jdbc.result-set :as rs]))
 
-(defn count*
-  [db table]
-  (let [ds (jdbc/get-datasource db)]
-    (sql/query ds
-               (honey/format (q/count* table)))))
+(defn execute!
+  "Execute query and builds result set with keys in kebab case"
+  ([db query]
+   (execute! db query {}))
+  ([db query opts]
+   (let [formatted-query (honey/format query)]
+     (println formatted-query)
+     (jdbc/execute! db formatted-query
+                    (assoc opts :builder-fn rs/as-kebab-maps)))))
