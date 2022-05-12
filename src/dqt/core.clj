@@ -7,15 +7,16 @@
             [dqt.query-runner :as q]))
 
 (defn load-inputs
-  [[datastore table]]
+  [{:keys [datastore table]}]
   (map read-config [datastore table]))
 
 (defn process
   [parsed-options]
-  (let [{:keys [action options]} parsed-options
-        [datastore table]        (load-inputs ((juxt :datastore :table) options))
-        [table-name metrics]     ((juxt :table-name :metrics) table)]
+  (let [{:keys [action options]}           parsed-options
+        [datastore table]                  (load-inputs options)
+        {:keys [table-name metrics tests]} table]
     ;; validate metrics
+    (println tests)
     (println (m/get-metrics datastore table-name metrics))))
 
 (defn -main
