@@ -8,14 +8,8 @@
   [expr column-name]
   (keyword (format "%s-%s" (name expr) (name column-name))))
 
-(defn- -row-count
-  [column-name]
-  (if (some #(= column-name %) ["*" :*])
-    [[:count :*] :row-count]
-    [[:count column-name] (-as :count column-name)]))
-
 (def supported-metrics
-  {:row-count          -row-count
+  {:row-count          [[:count :*] :row-count]
    :avg                (fn avg [column-name]
                          [[:avg column-name] (-as :avg column-name)])
    :avg-length         (fn avg-length [column-name]
@@ -52,16 +46,19 @@
    :string            [:avg-length]})
 
 (defn- apply-expr
-  [selected-metrics {:keys [columns/metrics columns/column-name] :as column}]
+  [selected-metrics {:keys [columns/metrics columns/column-name]}]
   (mapv #((selected-metrics %) column-name) metrics))
 
 (defn get-select-map
   "Returns honeysql map for selecting columns"
   [columns metrics]
-  (println columns)
-  (let [selected-metrics (select-keys supported-metrics metrics)]
-    ;; TODO select-distinct if distinct
-    {:select (apply concat (mapv #(apply-expr selected-metrics %) columns))}))
+  (let [selected-metrics (select-keys supported-metrics metrics)
+        expressions      (apply concat (mapv #(apply-expr selected-metrics %) columns))]
+;; TODO select-distinct if distinct
+;; TODO check if row-count is needed
+    (if (some #{:row-count} metrics)
+      {:select (conj expressions (:row-count supported-metrics))}
+      {:select expressions})))
 
 (defn enrich-column-metadata
   "Enrich with metrics for given column based on data_type"
