@@ -4,6 +4,7 @@
             [dqt.cli :as cli]
             [dqt.information-schema :as info-schema]
             [dqt.metrics :as m]
+            [dqt.checks :as c]
             [dqt.query-runner :as q]))
 
 (defn load-inputs
@@ -12,12 +13,12 @@
 
 (defn process
   [parsed-options]
-  (let [{:keys [action options]}           parsed-options
-        [datastore table]                  (load-inputs options)
-        {:keys [table-name metrics tests]} table]
+  (let [{:keys [action options]}                       parsed-options
+        [datastore {:keys [table-name metrics tests]}] (load-inputs options)
+        metrics                                        (m/get-metrics datastore table-name metrics)]
     ;; validate metrics
-    (println tests)
-    (println (m/get-metrics datastore table-name metrics))))
+    (println metrics)
+    (println (mapv #(c/run-check % metrics) tests))))
 
 (defn -main
   "I don't do a whole lot ... yet."
