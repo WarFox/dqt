@@ -72,4 +72,4 @@
         enriched-columns (mapv enrich-column-metadata columns)
         query            (-> (get-select-map enriched-columns metrics)
                              (assoc :from table-name))]
-    (q/execute! db query)))
+    (q/execute-one! db query)))
