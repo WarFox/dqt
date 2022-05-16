@@ -4,6 +4,7 @@
   "Return true if predicate returns false"
   [check metrics]
   (let [[metric-column op value] check
-        result                   (op (metric-column metrics) value)]
-    (println (format "Test: (%s %s %s) is %s" metric-column op value result))
-    result))
+        f (resolve op)
+        result                   (apply f [(metric-column metrics) value])]
+    (printf "Test: [%s (%s %s %s)] is %s\n" metric-column op (metric-column metrics) value result)
+    [check result]))

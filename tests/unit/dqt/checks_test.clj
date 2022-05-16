@@ -3,4 +3,4 @@
              [dqt.checks :as sut]))
 
 (deftest run-check-test
-  (is (= true (sut/run-check [:metric-column > 2] {:metric-column 20}))))
+  (is (= [[:metric-column '> 2] true] (sut/run-check [:metric-column '> 2] {:metric-column 20}))))

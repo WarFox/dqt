@@ -1,6 +1,6 @@
 (ns dqt.core
   (:gen-class)
-  (:require [aero.core :refer (read-config)]
+  (:require [aero.core :as aero]
             [dqt.cli :as cli]
             [dqt.information-schema :as info-schema]
             [dqt.metrics :as m]
@@ -9,7 +9,7 @@
 
 (defn load-inputs
   [{:keys [datastore table]}]
-  (map read-config [datastore table]))
+  (map aero/read-config [datastore table]))
 
 (defn process
   [parsed-options]
@@ -18,7 +18,7 @@
         metrics                                        (m/get-metrics datastore table-name metrics)]
     ;; validate metrics
     (println metrics)
-    (println (mapv #(c/run-check % metrics) tests))))
+    (mapv #(c/run-check % metrics) tests)))
 
 (defn -main
   "I don't do a whole lot ... yet."
