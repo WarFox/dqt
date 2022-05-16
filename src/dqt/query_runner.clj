@@ -11,4 +11,16 @@
    (let [formatted-query (honey/format query)]
      (println formatted-query)
      (jdbc/execute! db formatted-query
-                    (assoc opts :builder-fn rs/as-kebab-maps)))))
+                    (assoc opts
+                           :builder-fn rs/as-kebab-maps)))))
+
+(defn execute-one!
+  "Execute query and builds result set with keys in kebab case"
+  ([db query]
+   (execute-one! db query {}))
+  ([db query opts]
+   (let [formatted-query (honey/format query)]
+     (println formatted-query)
+     (jdbc/execute-one! db formatted-query
+                        (assoc opts
+                               :builder-fn rs/as-kebab-maps)))))

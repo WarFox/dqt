@@ -13,7 +13,11 @@
 (deftest get-select-map-test
   (let [columns [#:columns {:data-type :integer :metrics [:avg :max] :column-name :salary}]]
     (is (= {:select [[[:avg :salary] :avg-salary] [[:max :salary] :max-salary]]}
-           (sut/get-select-map columns [:avg :max])))))
+           (sut/get-select-map columns [:avg :max])))
+
+    (deftest include-row-count-if-needed
+      (is (= {:select [[[:count :*] :row-count] [[:avg :salary] :avg-salary] [[:max :salary] :max-salary]]}
+             (sut/get-select-map columns [:avg :max :row-count]))))))
 
 (deftest enrich-column-metadata-test
   (is (= #:columns{:data-type :integer :metrics [:avg :min :max]}
