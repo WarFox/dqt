@@ -58,3 +58,10 @@
   (if exit-message
     (exit (if ok? 0 1) exit-message)
     opts))
+
+(defn init
+  [args]
+  (-> args
+      parse
+      validate-options
+      pass-or-exit))
