@@ -105,6 +105,10 @@ Run =docker compose up= to have postgress running
   > clj -T:build test
 #+end_src
 
+* References
+
+- https://www.sweettooth.dev/endpoint/dev/architecture/integrant-tutorial.html
+
 * License
 
 Copyright © 2021 Warfox

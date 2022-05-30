@@ -2,29 +2,24 @@
   (:gen-class)
   (:require [aero.core :as aero]
             [dqt.cli :as cli]
-            [dqt.information-schema :as info-schema]
-            [dqt.metrics :as m]
-            [dqt.checks :as c]
-            [dqt.query-runner :as q]))
+            [dqt.system :as system]))
 
-(defn load-inputs
+(defn- load-inputs
   [{:keys [datastore table]}]
   (map aero/read-config [datastore table]))
 
-(defn process
+(defn- ->options
   [parsed-options]
-  (let [{:keys [action options]}                       parsed-options
-        [datastore {:keys [table-name metrics tests]}] (load-inputs options)
-        metrics                                        (m/get-metrics datastore table-name metrics)]
-    ;; validate metrics
-    (println metrics)
-    (mapv #(c/run-check % metrics) tests)))
+  (let [{:keys [action options]} parsed-options
+        [datastore table]        (load-inputs options)]
+    (assoc table
+           :action action
+           :datastore datastore)))
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "entrypoint"
   [& args]
   (-> args
-      cli/parse
-      cli/validate-options
-      cli/pass-or-exit
-      process))
+      cli/init
+      ->options
+      system/init))

@@ -4,7 +4,11 @@
   "Return true if predicate returns false"
   [check metrics]
   (let [[metric-column op value] check
-        f (resolve op)
-        result                   (apply f [(metric-column metrics) value])]
-    (printf "Test: [%s (%s %s %s)] is %s\n" metric-column op (metric-column metrics) value result)
-    [check result]))
+        f                        (resolve op)]
+    (if-some [metric-value (get metrics metric-column)]
+      (let [result (apply f [metric-value value])]
+        (printf "Test: [%s (%s %s %s)] is %s\n" metric-column op metric-value value result)
+        [check result])
+      (do
+        (println metric-column "is nil")
+        [check nil]))))
