@@ -6,7 +6,7 @@
 (deftest column-metadata-test
   (is (= {:select [:column-name :data-type :is-nullable]
           :from :information_schema.columns
-          :where [:= :table-name "my-table-name"]}
+          :where [:= :table-name "my_table_name"]}
          (sut/column-metadata :my-table-name))))
 
 (deftest get-columns-metadata-test

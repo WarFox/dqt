@@ -1,33 +1,39 @@
 (ns dqt.system
   (:require
    [dqt.checks :as c]
-   [dqt.cli :as cli]
+   [dqt.information-schema :as info]
    [dqt.metrics :as m]
-   [integrant.core :as ig]))
+   [integrant.core :as ig]
+   [next.jdbc :as jdbc]))
 
 (defn config
   [options]
-  {::sql-metrics  options
-   ::test-results {:metrics (ig/ref ::sql-metrics)
-                   :tests   options}})
+  {::db-connection    (:datastore options)
+   ::columns-metadata {:db         (ig/ref ::db-connection)
+                       :table-name (:table-name options)}
+   ::sql-metrics      (assoc options
+                             :db (ig/ref ::db-connection)
+                             :columns-metadata (ig/ref ::columns-metadata))
+   ::test-results     {:metrics (ig/ref ::sql-metrics)
+                       :tests   options}})
 
-(defmethod ig/init-key ::datastore
-  [_ {:keys [datastore]}]
-  datastore)
+(defmethod ig/init-key ::db-connection
+  [_ db]
+  (jdbc/get-connection db))
 
-(defmethod ig/init-key ::action
-  [_ {:keys [action]}]
-  action)
+(defmethod ig/init-key ::columns-metadata
+  [_ {:keys [db table-name]}]
+  (info/get-columns-metadata db table-name))
 
 (defmethod ig/init-key ::sql-metrics
-  [_ {:keys [datastore table-name metrics]}]
-  (m/get-metrics datastore table-name metrics))
+  [_ {:keys [db table-name columns-metadata metrics]}]
+  (m/get-metrics db table-name columns-metadata metrics))
 
 (defmethod ig/init-key ::test-results
   [_ {:keys [metrics tests]}]
   (mapv #(c/run-check % metrics) (:tests tests)))
 
 (defn init
-  [parsed-options]
-  (let [config (config parsed-options)]
-    (ig/init config)))
+  "Initialise system"
+  [options]
+  (ig/init (config options)))

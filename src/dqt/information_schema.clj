@@ -3,14 +3,14 @@
             [dqt.query-runner :as q]))
 
 (defn column-metadata
+  "honey-sql query for information-schema"
   [table-name]
   {:select [:column-name :data-type :is-nullable]
    :from   :information_schema.columns
-   :where  [:= :table-name (name table-name)]})
+   :where  [:= :table-name (csk/->snake_case_string table-name)]})
 
 (defn get-columns-metadata
   "Get column metadata from information schema as table qualified map"
   [db table-name]
   (let [resultset (q/execute! db (column-metadata table-name))]
-    (println resultset)
     (mapv #(update-vals % csk/->kebab-case-keyword) resultset)))
