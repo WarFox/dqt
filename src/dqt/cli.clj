@@ -1,6 +1,7 @@
 (ns dqt.cli
-  (:require [clojure.tools.cli :as cli]
-            [clojure.string :as string]))
+  (:require
+   [clojure.tools.cli :as cli]
+   [clojure.string :as string]))
 
 (defonce cli-options
   [[nil "--fail-if-invalid" "Set to true if you want to fail the task when data is invalid"

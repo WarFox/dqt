@@ -1,8 +1,9 @@
 (ns dqt.core
   (:gen-class)
-  (:require [aero.core :as aero]
-            [dqt.cli :as cli]
-            [dqt.system :as system]))
+  (:require
+   [aero.core :as aero]
+   [dqt.cli :as cli]
+   [dqt.system :as system]))
 
 (defn- read-inputs
   [{:keys [datastore table]}]

@@ -1,6 +1,7 @@
 (ns dqt.information-schema
-  (:require [camel-snake-kebab.core :as csk]
-            [dqt.query-runner :as q]))
+  (:require
+   [camel-snake-kebab.core :as csk]
+   [dqt.query-runner :as q]))
 
 (defn column-metadata
   "honey-sql query for information-schema"

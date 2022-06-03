@@ -1,6 +1,7 @@
 (ns dqt.checks-test
-  (:require  [clojure.test :refer :all]
-             [dqt.checks :as sut]))
+  (:require
+   [clojure.test :refer :all]
+   [dqt.checks :as sut]))
 
 (deftest run-check-test
   (let [metrics {:metric-column-1 20 :metric-column-2 nil}]

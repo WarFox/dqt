@@ -1,7 +1,8 @@
 (ns dqt.query-runner
-  (:require [honey.sql :as honey]
-            [next.jdbc :as jdbc]
-            [next.jdbc.result-set :as rs]))
+  (:require
+   [honey.sql :as honey]
+   [next.jdbc :as jdbc]
+   [next.jdbc.result-set :as rs]))
 
 (defn execute!
   "Execute query and builds result set with keys in kebab case"

@@ -1,6 +1,6 @@
 (ns dqt.fixtures
-  (:require  [clojure.test :refer :all]
-             [dqt.migrations :as m]))
+  (:require
+   [dqt.migrations :as m]))
 
 (defn run-migrations
   "Run migrations"
