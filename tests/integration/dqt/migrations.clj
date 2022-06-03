@@ -1,6 +1,7 @@
 (ns dqt.migrations
-  (:require [migratus.core :as migratus]
-            [dqt.config :as config]))
+  (:require
+   [dqt.config :as config]
+   [migratus.core :as migratus]))
 
 (defn migrate
   []

@@ -1,9 +1,8 @@
 (ns dqt.metrics-test
-  (:require [clojure.test :refer :all]
-            [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as g]
-            [dqt.metrics :as sut]
-            [clojure.set :as set]))
+  (:require
+   [clojure.spec.alpha :as s]
+   [clojure.test :refer :all]
+   [dqt.metrics :as sut]))
 
 (s/def :columns/data-type #{:integer :character-varying :date})
 (s/def :columns/column-name keyword?)

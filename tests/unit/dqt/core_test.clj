@@ -1,7 +1,8 @@
 (ns dqt.core-test
-  (:require [clojure.test :refer :all]
-            [dqt.core :as sut]
-            [dqt.system :as system]))
+  (:require
+   [clojure.test :refer :all]
+   [dqt.core :as sut]
+   [dqt.system :as system]))
 
 (deftest app-test
   (testing "app initialises system"
