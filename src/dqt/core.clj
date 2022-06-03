@@ -16,10 +16,19 @@
            :action action
            :datastore datastore)))
 
+(defn app
+  [options]
+  (try
+    (system/init options)
+    (catch Exception ex
+      (println (ex-message ex))
+      (println "Caused by:")
+      (println ((juxt ex-message ex-data) (ex-cause ex))))))
+
 (defn -main
   "entrypoint"
   [& args]
   (-> args
-      cli/init
-      ->options
-      system/init))
+      (cli/init)
+      (->options)
+      (app)))
