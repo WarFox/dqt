@@ -1,8 +1,6 @@
 (ns dqt.metrics
-  (:require [clojure.string :as str]
-            [honey.sql :as honey]
-            [dqt.query-runner :as q]
-            [dqt.information-schema :as info-schema]))
+  (:require
+   [dqt.query-runner :as q]))
 
 (defn -as
   [expr column-name]
@@ -67,9 +65,8 @@
          :columns/metrics (data-type data-type-metrics)))
 
 (defn get-metrics
-  [db table-name metrics]
-  (let [columns          (info-schema/get-columns-metadata db table-name)
-        enriched-columns (mapv enrich-column-metadata columns)
+  [db table-name columns metrics]
+  (let [enriched-columns (mapv enrich-column-metadata columns)
         query            (-> (get-select-map enriched-columns metrics)
                              (assoc :from table-name))]
     (q/execute-one! db query)))

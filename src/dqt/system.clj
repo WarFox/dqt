@@ -1,37 +1,36 @@
 (ns dqt.system
   (:require
    [dqt.checks :as c]
-   [dqt.cli :as cli]
+   [dqt.information-schema :as info]
    [dqt.metrics :as m]
-   [dqt.information-schema :as info-schema]
-   [integrant.core :as ig]))
+   [integrant.core :as ig]
+   [next.jdbc :as jdbc]))
 
 (defn config
   [options]
-  {::columns-metadata options
+  {::db-connection    (:datastore options)
+   ::columns-metadata {:db         (ig/ref ::db-connection)
+                       :table-name (:table-name options)}
    ::sql-metrics      (assoc options
+                             :db (ig/ref ::db-connection)
                              :columns-metadata (ig/ref ::columns-metadata))
    ::test-results     {:metrics (ig/ref ::sql-metrics)
                        :tests   options}})
 
-(defmethod ig/init-key ::datastore
-  [_ {:keys [datastore]}]
-  datastore)
-
-(defmethod ig/init-key ::action
-  [_ {:keys [action]}]
-  action)
+(defmethod ig/init-key ::db-connection
+  [_ db]
+  (jdbc/get-connection db))
 
 (defmethod ig/init-key ::columns-metadata
-  [_ {:keys [datastore table-name]}]
-  (info-schema/get-columns-metadata datastore table-name))
+  [_ {:keys [db table-name]}]
+  (info/get-columns-metadata db table-name))
 
 (defmethod ig/init-key ::sql-metrics
-  [_ {:keys [datastore table-name columns-metadata metrics]}]
+  [_ {:keys [db table-name columns-metadata metrics]}]
   (when (empty? columns-metadata)
     (throw (ex-info "columns-metadata is empty. Is the table name correct?"
                     {:table-name table-name})))
-  (m/get-metrics datastore table-name columns-metadata metrics))
+  (m/get-metrics db table-name columns-metadata metrics))
 
 (defmethod ig/init-key ::test-results
   [_ {:keys [metrics tests]}]

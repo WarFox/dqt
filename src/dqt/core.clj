@@ -4,14 +4,14 @@
             [dqt.cli :as cli]
             [dqt.system :as system]))
 
-(defn- load-inputs
+(defn- read-inputs
   [{:keys [datastore table]}]
   (map aero/read-config [datastore table]))
 
 (defn- ->options
   [parsed-options]
   (let [{:keys [action options]} parsed-options
-        [datastore table]        (load-inputs options)]
+        [datastore table]        (read-inputs options)]
     (assoc table
            :action action
            :datastore datastore)))
