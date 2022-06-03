@@ -27,9 +27,6 @@
 
 (defmethod ig/init-key ::sql-metrics
   [_ {:keys [db table-name columns-metadata metrics]}]
-  (when (empty? columns-metadata)
-    (throw (ex-info "columns-metadata is empty. Is the table name correct?"
-                    {:table-name table-name})))
   (m/get-metrics db table-name columns-metadata metrics))
 
 (defmethod ig/init-key ::test-results

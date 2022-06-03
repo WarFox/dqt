@@ -66,6 +66,9 @@
 
 (defn get-metrics
   [db table-name columns metrics]
+  (when (empty? columns)
+    (throw (ex-info "columns-metadata is empty. Is the table name correct?"
+                    {:table-name table-name})))
   (let [enriched-columns (mapv enrich-column-metadata columns)
         query            (-> (get-select-map enriched-columns metrics)
                              (assoc :from table-name))]

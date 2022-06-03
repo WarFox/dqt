@@ -22,3 +22,9 @@
 (deftest enrich-column-metadata-test
   (is (= #:columns{:data-type :integer :metrics [:avg :min :max]}
          (sut/enrich-column-metadata #:columns{:data-type :integer}))))
+
+(deftest get-metrics-test
+  (testing "must throw error when column metadat is empty"
+    (is (thrown-with-msg?
+         clojure.lang.ExceptionInfo #"columns-metadata is empty. Is the table name correct?"
+         (sut/get-metrics :db :table-name [] :metrics)))))
