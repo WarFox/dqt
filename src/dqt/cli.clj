@@ -7,7 +7,7 @@
   [[nil "--fail-if-invalid" "Set to true if you want to fail the task when data is invalid"
     :default false]
    ["-t" "--table TABLE" "Table name" :default ""]
-   ["-d" "--datastore DATASTORE" "Data store credentials" :default ""]
+   ["-d" "--datasource DATASOURCE" "Configuration and credentials for datasource" :default ""]
    ["-h" "--help"]])
 
 (defn usage [options-summary]

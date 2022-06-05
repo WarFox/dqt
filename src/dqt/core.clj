@@ -6,16 +6,16 @@
    [dqt.system :as system]))
 
 (defn- read-inputs
-  [{:keys [datastore table]}]
-  (map aero/read-config [datastore table]))
+  [{:keys [datasource table]}]
+  (map aero/read-config [datasource table]))
 
-(defn- ->options
+(defn- merge-options
   [parsed-options]
   (let [{:keys [action options]} parsed-options
-        [datastore table]        (read-inputs options)]
-    (assoc table
-           :action action
-           :datastore datastore)))
+        [datasource table]        (read-inputs options)]
+    (merge table
+           {:action    action
+            :datasource datasource})))
 
 (defn app
   [options]
@@ -31,5 +31,5 @@
   [& args]
   (-> args
       (cli/init)
-      (->options)
+      (merge-options)
       (app)))

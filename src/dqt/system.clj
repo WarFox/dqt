@@ -8,7 +8,7 @@
 
 (defn config
   [options]
-  {::db-connection    (:datastore options)
+  {::db-connection    (:datasource options)
    ::columns-metadata {:db         (ig/ref ::db-connection)
                        :table-name (:table-name options)}
    ::sql-metrics      (assoc options
