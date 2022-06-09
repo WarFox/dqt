@@ -10,9 +10,12 @@
    ["-d" "--datastore DATASTORE" "Data store credentials" :default ""]
    ["-h" "--help"]])
 
+(defonce version
+  (-> (class *ns*) .getPackage .getImplementationVersion))
+
 (defn usage [options-summary]
   (->> ["dqt - Data Quality Tool"
-        "version: package-version-number"
+        (format "version: %s" version)
         ""
         "Usage: dqt [options] action"
         ""
