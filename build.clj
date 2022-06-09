@@ -17,10 +17,17 @@
   [opts]
   (bb/run-tests opts))
 
+(def manifest-entries
+  {"Build-Jdk-Spec"         (System/getProperty "java.specification.version")
+   "Implementation-Version" version})
+
 (defn uberjar
   "Build the uberjar."
   [opts]
   (-> opts
-      (assoc :lib lib :version version :main main)
+      (assoc :lib lib
+             :version version
+             :main main
+             :manifest manifest-entries)
       (bb/clean)
       (bb/uber)))
