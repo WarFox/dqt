@@ -5,6 +5,6 @@
 (defn run-migrations
   "Run migrations"
   [f]
-  (m/migrate)
+  (m/migrate f)
   (f)
-  (m/rollback))
+  (m/rollback f))

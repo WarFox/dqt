@@ -104,10 +104,16 @@ FIXME: listing of options this app accepts.
 
 Run =docker compose up= to have postgress running
 
+** Run migraion
+
+#+begin_src
+  $ clj -X:dev:migrate
+#+end_src
+
 ** Run test
 
 #+begin_src
-  > clj -T:build test
+  $ clj -T:build test
 #+end_src
 
 * References
