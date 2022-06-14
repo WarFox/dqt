@@ -6,8 +6,10 @@ A simple data quality tool. Collect and publish metrics about quality of data an
 
 1. [[./docs/dimensions.org][Dimensions of data quality]]
 
-* Features [0/11]
+* Features [2/12]
 
+- [X] get metrics
+- [X] run tests
 - [ ] publish metrics to aws
 - [ ] publish metrics to prometheus
 - [ ] publish metadata to DataHub
@@ -25,34 +27,34 @@ Download from https://github.com/warfox/dqt
 
 * Usage
 
-FIXME: explanation
+`dqt` is a command line tool that runs on JVM.
 
-Run the project directly, via `:exec-fn`:
-
-#+begin_src
-    $ clojure -X:run-x
-    Hello, Clojure!
-#+end_src
-
-Run the project, overriding the name to be greeted:
+Make sure you have the jdbc drivers in classpath.
 
 #+begin_src
-    $ clojure -X:run-x :name '"Someone"'
-    Hello, Someone!
+  java -jar dqt.jar run -d datasource.edn -t table.edn
 #+end_src
+
+#+begin_src
+   java -cp "/path/to/jdbc/driver/jar/:./dqt.jar" dqt.core run -d examples/postgres.edn -t examples/tables/employees.edn
+#+end_src
+
+** datasource.edn
+
+** table.edn
+
+* Development
 
 Run the project directly, via `:main-opts` (`-m dqt.core`):
 
 #+begin_src
-    $ clojure -M:run-m
-    Hello, World!
+    $ clojure -M:run
 #+end_src
 
-Run the project, overriding the name to be greeted:
+Run the project, with parameters
 
 #+begin_src
-    $ clojure -M:run-m Via-Main
-    Hello, Via-Main!
+    $ clojure -M:run -d datasource.edn -t table.edn
 #+end_src
 
 Run the project's tests (they'll fail until you edit them):
@@ -61,11 +63,14 @@ Run the project's tests (they'll fail until you edit them):
     $ clojure -T:build test
 #+end_src
 
+#+begin_src
+  $ ./bin/kaocha
+#+end_src
 
-Run the project's CI pipeline and build an uberjar (this will fail until you edit the tests to pass):
+Build uberjar
 
 #+begin_src
-    $ clojure -T:build ci
+    $ clojure -T:build uberjar
 #+end_src
 
 This will produce an updated =pom.xml= file with synchronized dependencies inside the =META-INF=
@@ -99,10 +104,16 @@ FIXME: listing of options this app accepts.
 
 Run =docker compose up= to have postgress running
 
+** Run migraion
+
+#+begin_src
+  $ clj -X:dev:migrate
+#+end_src
+
 ** Run test
 
 #+begin_src
-  > clj -T:build test
+  $ clj -T:build test
 #+end_src
 
 * References
