@@ -26,10 +26,22 @@
   [column-name]
   [[:min column-name] (-as :min column-name)])
 
+(defn -min-length
+  [column-name]
+  [[:min [[:length column-name]]] (-as :min-length column-name)])
+
+(defn -stddev [column-name]
+  [[:stddev column-name] (-as :stddev column-name)])
+
+(defn -sum [column-name]
+  [[:sum column-name] (-as :sum column-name)])
+
+(defn -variance [column-name]
+  [[:variance column-name] (-as :variance column-name)])
+
 (def metrics-fns
   "Map of metrics and functions"
-  {:row-count          [[:count :*] :row-count]
-   :avg                -avg
+  {:avg                -avg
    :avg-length         -avg-length
    :duplicate-count    identity
    :frequent-values    identity
@@ -37,28 +49,29 @@
    :invalid-count      identity
    :invalid-percentage identity
    :max                -max
-   :maxs               identity
    :max-length         -max-length
+   :maxs               identity
    :min                -min
+   :min-length         -min-length
    :mins               identity
-   :min-length         identity
    :missing-count      identity
    :missing-percentage identity
-   :stddev             identity
-   :sum                identity
-   :uniqueness         identity
+   :row-count          [[:count :*] :row-count]
+   :stddev             -stddev
+   :sum                -sum
    :unique-count       identity
+   :uniqueness         identity
    :valid-count        identity
    :valid-percentage   identity
    :values-count       identity
    :values-percentage  identity
-   :variance           identity})
+   :variance           -variance})
 
 (def metrics-for-data-type
-  {:integer           [:avg :min :max]
-   :numeric           [:avg :min :max]
-   :character-varying [:avg-length]
-   :string            [:avg-length]})
+  {:integer           [:avg :max :min :stddev :sum :variance]
+   :numeric           [:avg :max :min :stddev :sum :variance]
+   :character-varying [:avg-length :min-length :max-length]
+   :string            [:avg-length :min-length :max-length]})
 
 (defn- apply-expr
   [selected-metrics {:keys [columns/metrics columns/column-name]}]
