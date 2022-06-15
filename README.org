@@ -87,7 +87,6 @@ Run that uberjar:
     $ java -jar target/dqt-0.1.0-SNAPSHOT.jar
 #+end_src
 
-
 If you remove =version= from =build.clj=, the uberjar will become =target/dqt-standalone.jar=.
 
 * Options
@@ -96,7 +95,45 @@ FIXME: listing of options this app accepts.
 
 * Examples
 
-...
+** datasource file datasource.edn
+#+begin_src clojure
+ {:dbtype     "postgresql"
+ :dbname     "postgres"
+ :host       #or [#env DATABASE_HOSTNAME "localhost"]
+ :user       "postgres"
+ :password   "postgres"
+ :ssl        false
+ :classname  "org.postgres.Driver"
+ :sslfactory "org.postgresql.ssl.NonValidatingFactory"}
+#+end_src
+
+** table file employees.edn
+
+#+begin_src clojure
+{:table-name :employees
+ :metrics    [:row-count
+              :avg-length
+              :max-length
+              :min-length
+              :avg
+              :sum
+              :max
+              :min
+              :stddev
+              :variance]
+
+ :tests      [[:row-count > 10]
+              [:avg-length-phone-number < 13]
+              [:stddev-salary > 4500]
+              [:sum-salary > 20000]
+              [:max-length-email < 30]]}
+#+end_src
+
+** Run
+
+#+begin_src
+clj -M:dev:run run -d datasource.edn -t tables/employees.edn
+#+end_src
 
 * Development
 

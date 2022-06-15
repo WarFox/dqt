@@ -1,68 +1,98 @@
 (ns dqt.metrics
   (:require
+   [camel-snake-kebab.core :as csk]
    [dqt.query-runner :as q]))
 
 (defn -as
   [expr column-name]
-  (keyword (format "%s-%s" (name expr) (name column-name))))
+  (csk/->kebab-case-keyword (format "%s-%s" (name expr) (name column-name))))
 
-(def supported-metrics
-  {:row-count          [[:count :*] :row-count]
-   :avg                (fn avg [column-name]
-                         [[:avg column-name] (-as :avg column-name)])
-   :avg-length         (fn avg-length [column-name]
-                         [[:avg [[:length column-name]]] (-as :avg-length column-name)])
+(defn -avg [column-name]
+  [[:avg column-name] (-as :avg column-name)])
+
+(defn -avg-length
+  [column-name]
+  [[:avg [[:length column-name]]] (-as :avg-length column-name)])
+
+(defn -max
+  [column-name]
+  [[:max column-name] (-as :max column-name)])
+
+(defn -max-length
+  [column-name]
+  [[:max [[:length column-name]]] (-as :max-length column-name)])
+
+(defn -min
+  [column-name]
+  [[:min column-name] (-as :min column-name)])
+
+(defn -min-length
+  [column-name]
+  [[:min [[:length column-name]]] (-as :min-length column-name)])
+
+(defn -stddev [column-name]
+  [[:stddev column-name] (-as :stddev column-name)])
+
+(defn -sum [column-name]
+  [[:sum column-name] (-as :sum column-name)])
+
+(defn -variance [column-name]
+  [[:variance column-name] (-as :variance column-name)])
+
+(def metrics-fns
+  "Map of metrics and functions"
+  {:avg                -avg
+   :avg-length         -avg-length
    :duplicate-count    identity
    :frequent-values    identity
    :histogram          identity
    :invalid-count      identity
    :invalid-percentage identity
-   :max                (fn max
-                         [column-name] [[:max column-name] (-as :max column-name)])
+   :max                -max
+   :max-length         -max-length
    :maxs               identity
-   :max-length         identity
-   :min                (fn min
-                         [column-name] [[:min column-name] (-as :min column-name)])
+   :min                -min
+   :min-length         -min-length
    :mins               identity
-   :min-length         identity
    :missing-count      identity
    :missing-percentage identity
-   :stddev             identity
-   :sum                identity
-   :uniqueness         identity
+   :row-count          [[:count :*] :row-count]
+   :stddev             -stddev
+   :sum                -sum
    :unique-count       identity
+   :uniqueness         identity
    :valid-count        identity
    :valid-percentage   identity
    :values-count       identity
    :values-percentage  identity
-   :variance           identity})
+   :variance           -variance})
 
-(def data-type-metrics
-  {:integer           [:avg :min :max]
-   :numeric           [:avg :min :max]
-   :character-varying [:avg-length]
-   :string            [:avg-length]})
+(def metrics-for-data-type
+  {:integer           [:avg :max :min :stddev :sum :variance]
+   :numeric           [:avg :max :min :stddev :sum :variance]
+   :character-varying [:avg-length :min-length :max-length]
+   :string            [:avg-length :min-length :max-length]})
 
 (defn- apply-expr
   [selected-metrics {:keys [columns/metrics columns/column-name]}]
   (mapv #((selected-metrics %) column-name) metrics))
 
 (defn get-select-map
-  "Returns honeysql map for selecting columns"
+  "Returns honeysql map of select query for given column metrics"
   [columns metrics]
-  (let [selected-metrics (select-keys supported-metrics metrics)
+  (let [selected-metrics (select-keys metrics-fns metrics)
         expressions      (apply concat (mapv #(apply-expr selected-metrics %) columns))]
 ;; TODO select-distinct if distinct
 ;; TODO check if row-count is needed
     (if (some #{:row-count} metrics)
-      {:select (conj expressions (:row-count supported-metrics))}
+      {:select (conj expressions (:row-count metrics-fns))}
       {:select expressions})))
 
 (defn enrich-column-metadata
-  "Enrich with metrics for given column based on data_type"
+  "Enrich metadata with metrics for given column based on data-type"
   [{:keys [columns/data-type] :as column}]
   (assoc column
-         :columns/metrics (data-type data-type-metrics)))
+         :columns/metrics (data-type metrics-for-data-type)))
 
 (defn get-metrics
   [db table-name columns metrics]
