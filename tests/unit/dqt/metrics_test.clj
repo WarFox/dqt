@@ -27,3 +27,24 @@
     (is (thrown-with-msg?
          clojure.lang.ExceptionInfo #"columns-metadata is empty. Is the table name correct?"
          (sut/get-metrics :db :table-name [] :metrics)))))
+
+(deftest metrics-functions
+  (testing "avg"
+    (is (= [[:avg :my-column] :avg-my-column]
+           (sut/-avg :my-column))))
+
+  (testing "avg-length"
+    (is (= [[:avg [[:length :my-column]]] :avg-length-my-column]
+           (sut/-avg-length :my-column))))
+
+  (testing "max"
+    (is (= [[:max :my-column] :max-my-column]
+           (sut/-max :my-column))))
+
+  (testing "max-length"
+    (is (= [[:max [[:length :my-column]]] :max-length-my-column]
+           (sut/-max-length :my-column))))
+
+  (testing "min"
+    (is (= [[:min :my-column] :min-my-column]
+           (sut/-min :my-column)))))
