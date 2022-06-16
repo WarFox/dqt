@@ -11,13 +11,21 @@
 (s/def :columns/metadata (s/keys :req [:columns/data-type :columns/column-name :columns/is-nullable]))
 
 (deftest get-select-map-test
-  (let [columns [#:columns {:data-type :integer :metrics [:avg :max] :column-name :salary}]]
-    (is (= {:select [[[:avg :salary] :avg-salary] [[:max :salary] :max-salary]]}
-           (sut/get-select-map columns [:avg :max])))
+  (let [columns [#:columns {:data-type :integer :metrics [:avg :max] :column-name :salary}
+                 #:columns {:data-type :date :metrics [:min :max] :column-name :hire-date}]]
+    (is (= {:select [[[:avg :salary] :avg-salary]
+                     [[:max :salary] :max-salary]
+                     [[:min :hire-date] :min-hire-date]
+                     [[:max :hire-date] :max-hire-date]]}
+           (sut/get-select-map columns [:avg :max :min])))
 
-    (deftest include-row-count-if-needed
-      (is (= {:select [[[:count :*] :row-count] [[:avg :salary] :avg-salary] [[:max :salary] :max-salary]]}
-             (sut/get-select-map columns [:avg :max :row-count]))))))
+    (testing "row-count must be included if needed"
+      (is (= {:select [[[:count :*] :row-count]
+                       [[:avg :salary] :avg-salary]
+                       [[:max :salary] :max-salary]
+                       [[:min :hire-date] :min-hire-date]
+                       [[:max :hire-date] :max-hire-date]]}
+             (sut/get-select-map columns [:avg :max :min :row-count]))))))
 
 (deftest enrich-column-metadata-test
   (is (= #:columns{:data-type :integer :metrics [:avg :max :min :stddev :sum :variance]}
@@ -30,6 +38,7 @@
          (sut/get-metrics :db :table-name [] :metrics)))))
 
 (deftest metrics-functions
+  ;; TODO automate these test cases
   (testing "avg"
     (is (= (:avg sut/metrics-fns) expressions/-avg)))
 
@@ -46,7 +55,7 @@
     (is (= (:min sut/metrics-fns) expressions/-min)))
 
   (testing "min-length"
-      (is (= (:min-length sut/metrics-fns) expressions/-min-length)))
+    (is (= (:min-length sut/metrics-fns) expressions/-min-length)))
 
   (testing "stddev"
     (is (= (:stddev sut/metrics-fns) expressions/-stddev)))

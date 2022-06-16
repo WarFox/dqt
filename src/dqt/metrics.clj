@@ -34,6 +34,7 @@
 (def metrics-for-data-type
   {:integer           [:avg :max :min :stddev :sum :variance]
    :numeric           [:avg :max :min :stddev :sum :variance]
+   :date              [:max :min]
    :character-varying [:avg-length :min-length :max-length]
    :string            [:avg-length :min-length :max-length]})
 
