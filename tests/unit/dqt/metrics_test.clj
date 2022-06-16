@@ -2,7 +2,8 @@
   (:require
    [clojure.spec.alpha :as s]
    [clojure.test :refer :all]
-   [dqt.metrics :as sut]))
+   [dqt.metrics :as sut]
+   [dqt.sql.expressions :as expressions]))
 
 (s/def :columns/data-type #{:integer :character-varying :date})
 (s/def :columns/column-name keyword?)
@@ -30,37 +31,28 @@
 
 (deftest metrics-functions
   (testing "avg"
-    (is (= [[:avg :my-column] :avg-my-column]
-           (sut/-avg :my-column))))
+    (is (= (:avg sut/metrics-fns) expressions/-avg)))
 
   (testing "avg-length"
-    (is (= [[:avg [[:length :my-column]]] :avg-length-my-column]
-           (sut/-avg-length :my-column))))
+    (is (= (:avg-length sut/metrics-fns) expressions/-avg-length)))
 
   (testing "max"
-    (is (= [[:max :my-column] :max-my-column]
-           (sut/-max :my-column))))
+    (is (= (:max sut/metrics-fns) expressions/-max)))
 
   (testing "max-length"
-    (is (= [[:max [[:length :my-column]]] :max-length-my-column]
-           (sut/-max-length :my-column))))
+    (is (= (:max-length sut/metrics-fns) expressions/-max-length)))
 
   (testing "min"
-    (is (= [[:min :my-column] :min-my-column]
-           (sut/-min :my-column))))
+    (is (= (:min sut/metrics-fns) expressions/-min)))
 
   (testing "min-length"
-    (is (= [[:min [[:length :my-column]]] :min-length-my-column]
-           (sut/-min-length :my-column))))
+      (is (= (:min-length sut/metrics-fns) expressions/-min-length)))
 
   (testing "stddev"
-    (is (= [[:stddev :my-column] :stddev-my-column]
-           (sut/-stddev :my-column))))
+    (is (= (:stddev sut/metrics-fns) expressions/-stddev)))
 
   (testing "sum"
-    (is (= [[:sum :my-column] :sum-my-column]
-           (sut/-sum :my-column))))
+    (is (= (:sum sut/metrics-fns) expressions/-sum)))
 
   (testing "variance"
-    (is (= [[:variance :my-column] :variance-my-column]
-           (sut/-variance :my-column)))))
+    (is (= (:variance sut/metrics-fns) expressions/-variance))))

@@ -7,10 +7,10 @@
    [next.jdbc :as jdbc]))
 
 (defn config
-  [options]
-  {::db-connection    (:datastore options)
+  [{:keys [datastore table-name] :as options}]
+  {::db-connection    datastore
    ::columns-metadata {:db         (ig/ref ::db-connection)
-                       :table-name (:table-name options)}
+                       :table-name table-name}
    ::sql-metrics      (assoc options
                              :db (ig/ref ::db-connection)
                              :columns-metadata (ig/ref ::columns-metadata))

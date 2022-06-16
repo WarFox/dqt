@@ -1,71 +1,35 @@
 (ns dqt.metrics
   (:require
-   [camel-snake-kebab.core :as csk]
-   [dqt.query-runner :as q]))
-
-(defn -as
-  [expr column-name]
-  (csk/->kebab-case-keyword (format "%s-%s" (name expr) (name column-name))))
-
-(defn -avg [column-name]
-  [[:avg column-name] (-as :avg column-name)])
-
-(defn -avg-length
-  [column-name]
-  [[:avg [[:length column-name]]] (-as :avg-length column-name)])
-
-(defn -max
-  [column-name]
-  [[:max column-name] (-as :max column-name)])
-
-(defn -max-length
-  [column-name]
-  [[:max [[:length column-name]]] (-as :max-length column-name)])
-
-(defn -min
-  [column-name]
-  [[:min column-name] (-as :min column-name)])
-
-(defn -min-length
-  [column-name]
-  [[:min [[:length column-name]]] (-as :min-length column-name)])
-
-(defn -stddev [column-name]
-  [[:stddev column-name] (-as :stddev column-name)])
-
-(defn -sum [column-name]
-  [[:sum column-name] (-as :sum column-name)])
-
-(defn -variance [column-name]
-  [[:variance column-name] (-as :variance column-name)])
+   [dqt.query-runner :as q]
+   [dqt.sql.expressions :as expressions]))
 
 (def metrics-fns
   "Map of metrics and functions"
-  {:avg                -avg
-   :avg-length         -avg-length
+  {:avg                expressions/-avg
+   :avg-length         expressions/-avg-length
    :duplicate-count    identity
    :frequent-values    identity
    :histogram          identity
    :invalid-count      identity
    :invalid-percentage identity
-   :max                -max
-   :max-length         -max-length
+   :max                expressions/-max
+   :max-length         expressions/-max-length
    :maxs               identity
-   :min                -min
-   :min-length         -min-length
+   :min                expressions/-min
+   :min-length         expressions/-min-length
    :mins               identity
    :missing-count      identity
    :missing-percentage identity
    :row-count          [[:count :*] :row-count]
-   :stddev             -stddev
-   :sum                -sum
+   :stddev             expressions/-stddev
+   :sum                expressions/-sum
    :unique-count       identity
    :uniqueness         identity
    :valid-count        identity
    :valid-percentage   identity
    :values-count       identity
    :values-percentage  identity
-   :variance           -variance})
+   :variance           expressions/-variance})
 
 (def metrics-for-data-type
   {:integer           [:avg :max :min :stddev :sum :variance]
@@ -73,7 +37,7 @@
    :character-varying [:avg-length :min-length :max-length]
    :string            [:avg-length :min-length :max-length]})
 
-(defn- apply-expr
+(defn- fields
   [selected-metrics {:keys [columns/metrics columns/column-name]}]
   (mapv #((selected-metrics %) column-name) metrics))
 
@@ -81,7 +45,7 @@
   "Returns honeysql map of select query for given column metrics"
   [columns metrics]
   (let [selected-metrics (select-keys metrics-fns metrics)
-        expressions      (apply concat (mapv #(apply-expr selected-metrics %) columns))]
+        expressions      (apply concat (mapv #(fields selected-metrics %) columns))]
 ;; TODO select-distinct if distinct
 ;; TODO check if row-count is needed
     (if (some #{:row-count} metrics)
