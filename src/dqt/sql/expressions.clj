@@ -51,3 +51,8 @@
   "HoneySQL expression for variance of a column"
   [column-name]
   [[:variance column-name] (-as :variance column-name)])
+
+(defn -values-count
+  "HoneySQL expression for count of the column"
+  [column-name]
+  [[:count column-name] (-as :count column-name)])

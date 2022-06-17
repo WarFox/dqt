@@ -3,7 +3,6 @@
    [dqt.sql.expressions :as sut]
    [clojure.test :refer :all]))
 
-
 (deftest -avg-length-test
   (is (= [[:avg [[:length :my-column]]] :avg-length-my-column]
          (sut/-avg-length :my-column))))
@@ -35,3 +34,7 @@
 (deftest -variance-test
   (is (= [[:variance :my-column] :variance-my-column]
          (sut/-variance :my-column))))
+
+(deftest -values-count
+  (is (= [[:count :my-column] :count-my-column]
+         (sut/-values-count :my-column))))

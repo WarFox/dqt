@@ -27,13 +27,14 @@
    :uniqueness         identity
    :valid-count        identity
    :valid-percentage   identity
-   :values-count       identity
+   :values-count       expressions/-values-count
    :values-percentage  identity
    :variance           expressions/-variance})
 
 (def metrics-for-data-type
   {:integer           [:avg :max :min :stddev :sum :variance]
    :numeric           [:avg :max :min :stddev :sum :variance]
+   :any               [:values-count]
    :date              [:max :min]
    :character-varying [:avg-length :min-length :max-length]
    :string            [:avg-length :min-length :max-length]})
@@ -57,7 +58,9 @@
   "Enrich metadata with metrics for given column based on data-type"
   [{:keys [columns/data-type] :as column}]
   (assoc column
-         :columns/metrics (data-type metrics-for-data-type)))
+         :columns/metrics (apply conj
+                                 (get metrics-for-data-type data-type)
+                                 (:any metrics-for-data-type))))
 
 (defn get-metrics
   [db table-name columns metrics]

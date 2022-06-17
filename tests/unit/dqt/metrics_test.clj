@@ -28,7 +28,7 @@
              (sut/get-select-map columns [:avg :max :min :row-count]))))))
 
 (deftest enrich-column-metadata-test
-  (is (= #:columns{:data-type :integer :metrics [:avg :max :min :stddev :sum :variance]}
+  (is (= #:columns{:data-type :integer :metrics [:avg :max :min :stddev :sum :variance :values-count]}
          (sut/enrich-column-metadata #:columns{:data-type :integer}))))
 
 (deftest get-metrics-test
@@ -64,4 +64,7 @@
     (is (= (:sum sut/metrics-fns) expressions/-sum)))
 
   (testing "variance"
-    (is (= (:variance sut/metrics-fns) expressions/-variance))))
+    (is (= (:variance sut/metrics-fns) expressions/-variance)))
+
+  (testing "-values-count"
+    (is (= (:values-count sut/metrics-fns) expressions/-values-count))))
