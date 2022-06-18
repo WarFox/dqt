@@ -15,7 +15,8 @@
                              :db (ig/ref ::db-connection)
                              :columns-metadata (ig/ref ::columns-metadata))
    ::test-results     {:metrics (ig/ref ::sql-metrics)
-                       :tests   options}})
+                       :tests   options}
+   ::report           (ig/ref ::test-results)})
 
 (defmethod ig/init-key ::db-connection
   [_ db]
@@ -32,6 +33,17 @@
 (defmethod ig/init-key ::test-results
   [_ {:keys [metrics tests]}]
   (mapv #(c/run-check % metrics) (:tests tests)))
+
+(defn- test-failed?
+  [test-result]
+  (not (second test-result)))
+
+(defmethod ig/init-key ::report
+  [_ test-results]
+  (if (some test-failed? test-results)
+    (println "Failed")
+    (println "Success"))
+  test-results)
 
 (defn init
   "Initialise system"
