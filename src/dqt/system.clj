@@ -8,15 +8,18 @@
 
 (defn config
   [{:keys [datastore table-name] :as options}]
-  {::db-connection    datastore
-   ::columns-metadata {:db         (ig/ref ::db-connection)
-                       :table-name table-name}
-   ::sql-metrics      (assoc options
-                             :db (ig/ref ::db-connection)
-                             :columns-metadata (ig/ref ::columns-metadata))
-   ::test-results     {:metrics (ig/ref ::sql-metrics)
-                       :tests   options}
-   ::report           (ig/ref ::test-results)})
+  {::db-connection            datastore
+   ::columns-metadata         {:db         (ig/ref ::db-connection)
+                               :table-name table-name}
+   ::columns-metadata-enriched (ig/ref ::columns-metadata)
+   ::sql-metrics              (assoc options
+                                     :db (ig/ref ::db-connection)
+                                     :columns-metadata (ig/ref ::columns-metadata-enriched))
+   ::test-results             {:metrics (ig/ref ::sql-metrics)
+                               :tests   options}
+   ::calculated-metrics       {:columns     (ig/ref ::columns-metadata-enriched)
+                               :sql-metrics (ig/ref ::sql-metrics)}
+   ::report                   (ig/ref ::test-results)})
 
 (defmethod ig/init-key ::db-connection
   [_ db]
@@ -25,6 +28,10 @@
 (defmethod ig/init-key ::columns-metadata
   [_ {:keys [db table-name]}]
   (info/get-columns-metadata db table-name))
+
+(defmethod ig/init-key ::columns-metadata-enriched
+  [_ columns-metadata]
+  (mapv m/enrich-column-metadata columns-metadata))
 
 (defmethod ig/init-key ::sql-metrics
   [_ {:keys [db table-name columns-metadata metrics]}]
@@ -44,6 +51,11 @@
     (println "Failed")
     (println "Success"))
   test-results)
+
+(defmethod ig/init-key ::calculated-metrics
+  [_ {:keys [columns sql-metrics]}]
+  (into {}
+        (map #(m/calculated-metrics % sql-metrics) columns)))
 
 (defn init
   "Initialise system"

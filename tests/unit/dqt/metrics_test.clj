@@ -28,7 +28,9 @@
              (sut/get-select-map columns [:avg :max :min :row-count]))))))
 
 (deftest enrich-column-metadata-test
-  (is (= #:columns{:data-type :integer :metrics [:avg :max :min :stddev :sum :variance :values-count]}
+  (is (= #:columns{:data-type          :integer
+                   :metrics            [:avg :max :min :stddev :sum :variance :values-count]
+                   :calculated-metrics '(:missing-count)}
          (sut/enrich-column-metadata #:columns{:data-type :integer}))))
 
 (deftest get-metrics-test
@@ -68,3 +70,16 @@
 
   (testing "-values-count"
     (is (= (:values-count sut/metrics-fns) expressions/-values-count))))
+
+(deftest get-metric-values-from-result
+  (let [metrics {:count-my-column 25
+                 :variance-my-column 30}]
+    (is (= 25 (sut/get-count metrics "my-column")))
+    (is (= 30 (sut/get-variance metrics "my-column")))))
+
+(deftest calculated-metrics-test
+  (let [columns     {:columns/calculated-metrics [:missing-count]
+                     :columns/column-name        :my-column}
+        sql-metrics {:row-count 40 :count-my-column 38}]
+    (is (= {:row-count 40 :count-my-column 38 :missing-count-my-column 2}
+           (sut/calculated-metrics columns sql-metrics)))))
