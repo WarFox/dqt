@@ -66,11 +66,9 @@
   [columns metrics]
   (let [selected-metric-fns (select-keys metrics-fns metrics)
         fields-list         (apply concat (map #(fields selected-metric-fns %) columns))]
-;; TODO select-distinct if distinct
-;; TODO check if row-count is needed
-    (if (some #{:row-count} metrics)
-      {:select (conj fields-list (:row-count metrics-fns))}
-      {:select fields-list})))
+    ;; TODO select-distinct if distinct
+    ;; TODO check if row-count is needed
+      {:select (conj fields-list (:row-count metrics-fns))}))
 
 (defn enrich-column-metadata
   "Enrich metadata with metrics for given column based on data-type"

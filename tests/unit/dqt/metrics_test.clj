@@ -13,19 +13,14 @@
 (deftest get-select-map-test
   (let [columns [#:columns {:data-type :integer :metrics [:avg :max] :column-name :salary}
                  #:columns {:data-type :date :metrics [:min :max] :column-name :hire-date}]]
-    (is (= {:select [[[:avg :salary] :avg-salary]
-                     [[:max :salary] :max-salary]
-                     [[:min :hire-date] :min-hire-date]
-                     [[:max :hire-date] :max-hire-date]]}
-           (sut/get-select-map columns [:avg :max :min])))
 
-    (testing "row-count must be included if needed"
+    (testing "row-count must be included with required metric fields"
       (is (= {:select [[[:count :*] :row-count]
                        [[:avg :salary] :avg-salary]
                        [[:max :salary] :max-salary]
                        [[:min :hire-date] :min-hire-date]
                        [[:max :hire-date] :max-hire-date]]}
-             (sut/get-select-map columns [:avg :max :min :row-count]))))))
+             (sut/get-select-map columns [:avg :max :min]))))))
 
 (deftest enrich-column-metadata-test
   (is (= #:columns{:data-type          :integer
