@@ -1,17 +1,24 @@
 (ns dqt.metrics
   (:require
+   [camel-snake-kebab.core :as csk]
    [dqt.query-runner :as q]
-   [dqt.sql.expressions :as expressions]
-   [camel-snake-kebab.core :as csk]))
+   [dqt.sql.expressions :as expressions]))
+
+(defn get-metric
+  "Get given `metric` value for `column-name` in `metrics`"
+  [metric metrics column-name]
+  (let [k  (keyword (format "%s-%s" metric (name column-name)))]
+    (k metrics)))
 
 (defn get-count
   "Get count of `column-name` in `metrics`"
   [metrics column-name]
-  (->> (name column-name) (format "count-%s") keyword metrics))
+  (get-metric "count" metrics column-name))
 
 (defn get-variance
+  "Get variance of `column-name` in `metrics`"
   [metrics column-name]
-  (->> (name column-name) (format "variance-%s") keyword metrics))
+  (get-metric "variance" metrics column-name))
 
 (defn -missing-count
   [metrics column-name]
@@ -46,7 +53,8 @@
    :values-percentage  identity
    :variance           expressions/-variance})
 
-(def metrics-for-data-type
+(def sql-metrics-group
+  "sql metrics grouped by data-type"
   {:integer           [:avg :max :min :stddev :sum :variance]
    :numeric           [:avg :max :min :stddev :sum :variance]
    :any               [:values-count]
@@ -55,49 +63,58 @@
    :string            [:avg-length :min-length :max-length]})
 
 (def calculated-metrics-group
+  "Calculated metrics grouped by data-type"
   {:any [:missing-count]})
 
-(defn- fields
-  [selected-metric-fns {:keys [columns/metrics columns/column-name]}]
-  (map #((selected-metric-fns %) column-name) metrics))
+(defn- field-expression
+  [metric-fns metric column-name]
+  (let [f (get metric-fns metric)]
+    (f column-name)))
 
-(defn get-select-map
-  "Returns honeysql map of select query for given column metrics"
-  [columns metrics]
-  (let [selected-metric-fns (select-keys metrics-fns metrics)
-        fields-list         (apply concat (map #(fields selected-metric-fns %) columns))]
+(defn fields
+  "Returns a list of honeysql fields for the given column based on `metrics-fns`"
+  [metric-fns {:keys [columns/sql-metrics columns/column-name]}]
+  (map #(field-expression metric-fns % column-name) sql-metrics))
+
+(defn sql-metrics-map
+  "Returns a honeysql map of select query for given `columns` and `table-name`"
+  ;; TODO pass metrics-fn as argument for proper testing
+  [columns table-name]
+  (let [fields-list (apply concat (map #(fields metrics-fns %) columns))]
     ;; TODO select-distinct if distinct
-    ;; TODO check if row-count is needed
-      {:select (conj fields-list (:row-count metrics-fns))}))
+    {:select (conj fields-list (:row-count metrics-fns))
+     :from   table-name}))
+
+(defn required-metrics
+  [metrics-group data-type metrics]
+  (apply conj
+         (filter #(some #{%} metrics) (get metrics-group data-type))
+         (:any metrics-group)))
 
 (defn enrich-column-metadata
-  "Enrich metadata with metrics for given column based on data-type"
-  [{:keys [columns/data-type] :as column}]
+  "Add list of sql-metrics and calculated metrics for `column` based on the data-type"
+  [{:keys [columns/data-type] :as column} metrics]
   (assoc column
-         :columns/metrics (apply conj
-                                 (get metrics-for-data-type data-type)
-                                 (:any metrics-for-data-type))
-         :columns/calculated-metrics (apply conj
-                                            (get calculated-metrics-group data-type)
-                                            (:any calculated-metrics-group))))
+         :columns/sql-metrics (required-metrics sql-metrics-group data-type metrics)
+         :columns/calculated-metrics (required-metrics calculated-metrics-group data-type metrics)))
 
 (defn get-metrics
-  [db table-name columns-metadata metrics]
+  [db table-name columns-metadata]
   (when (empty? columns-metadata)
     (throw (ex-info "columns-metadata is empty. Is the table name correct?"
                     {:table-name table-name})))
-  (let [query (-> (get-select-map columns-metadata metrics)
-                  (assoc :from table-name))]
-    (q/execute-one! db query)))
+  (q/execute-one! db
+                  (sql-metrics-map columns-metadata table-name)))
 
 (defn calculated-metrics
   [{:keys [:columns/calculated-metrics :columns/column-name]} sql-metrics]
-  (let [selected-metric-fns (select-keys metrics-fns calculated-metrics)]
+  (when (not-empty sql-metrics)
     (merge sql-metrics
            (into {}
                  (map
-                  (fn new-metric [metric-name]
-                    (let [metric-fn   (selected-metric-fns metric-name)
+                  (fn new-metric
+                    [metric-name]
+                    (let [metric-fn   (metrics-fns metric-name)
                           metric-name (format "%s-%s" (name metric-name) (name column-name))]
                       (hash-map
                        (csk/->kebab-case-keyword metric-name)

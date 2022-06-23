@@ -10,29 +10,38 @@
 (s/def :columns/is-nullable #{:yes :no})
 (s/def :columns/metadata (s/keys :req [:columns/data-type :columns/column-name :columns/is-nullable]))
 
-(deftest get-select-map-test
-  (let [columns [#:columns {:data-type :integer :metrics [:avg :max] :column-name :salary}
-                 #:columns {:data-type :date :metrics [:min :max] :column-name :hire-date}]]
+(deftest sql-metrics-map-test
+  ;; TODO add more data-types and metrics to this test, generative test?
+  (let [columns [#:columns {:data-type :integer :sql-metrics [:avg :max] :column-name :salary}
+                 #:columns {:data-type :date :sql-metrics [:min :max] :column-name :hire-date}]]
 
     (testing "row-count must be included with required metric fields"
       (is (= {:select [[[:count :*] :row-count]
                        [[:avg :salary] :avg-salary]
                        [[:max :salary] :max-salary]
                        [[:min :hire-date] :min-hire-date]
-                       [[:max :hire-date] :max-hire-date]]}
-             (sut/get-select-map columns [:avg :max :min]))))))
+                       [[:max :hire-date] :max-hire-date]]
+              :from :my-table-name}
+             (sut/sql-metrics-map columns :my-table-name))))))
 
 (deftest enrich-column-metadata-test
-  (is (= #:columns{:data-type          :integer
-                   :metrics            [:avg :max :min :stddev :sum :variance :values-count]
-                   :calculated-metrics '(:missing-count)}
-         (sut/enrich-column-metadata #:columns{:data-type :integer}))))
+  (testing "add sql-metrics and calculated metrics list to columns map"
+    (is (= #:columns{:data-type          :integer
+                     :sql-metrics        [:values-count :avg :max]
+                     :calculated-metrics '(:missing-count)}
+           (sut/enrich-column-metadata #:columns{:data-type :integer} [:avg :max])))))
 
 (deftest get-metrics-test
   (testing "must throw error when column metadat is empty"
     (is (thrown-with-msg?
          clojure.lang.ExceptionInfo #"columns-metadata is empty. Is the table name correct?"
-         (sut/get-metrics :db :table-name [] :metrics)))))
+         (sut/get-metrics :db :table-name [])))))
+
+(deftest required-metrics-test
+  (let [metric-group {:integer [:avg :max]
+                      :any [:values-count]}]
+    (is (= [:values-count :avg]
+           (sut/required-metrics metric-group :integer [:avg])))))
 
 (deftest metrics-functions
   ;; TODO automate these test cases
@@ -78,3 +87,10 @@
         sql-metrics {:row-count 40 :count-my-column 38}]
     (is (= {:row-count 40 :count-my-column 38 :missing-count-my-column 2}
            (sut/calculated-metrics columns sql-metrics)))))
+
+(deftest fields-test
+  (let [metric-fns {:metric-1 (fn [x] (str "metric-1 of " x))
+                    :metric-2 (fn [x] (str "metric-2 of " x))}]
+    (is (= ["metric-1 of my-column" "metric-2 of my-column"]
+           (sut/fields metric-fns
+                       #:columns{:sql-metrics [:metric-1 :metric-2] :column-name "my-column"})))))

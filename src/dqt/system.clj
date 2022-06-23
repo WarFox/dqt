@@ -8,18 +8,19 @@
 
 (defn config
   [{:keys [datastore table-name] :as options}]
-  {::db-connection            datastore
-   ::columns-metadata         {:db         (ig/ref ::db-connection)
-                               :table-name table-name}
-   ::columns-metadata-enriched (ig/ref ::columns-metadata)
-   ::sql-metrics              (assoc options
-                                     :db (ig/ref ::db-connection)
-                                     :columns-metadata (ig/ref ::columns-metadata-enriched))
-   ::test-results             {:metrics (ig/ref ::sql-metrics)
-                               :tests   options}
-   ::calculated-metrics       {:columns     (ig/ref ::columns-metadata-enriched)
-                               :sql-metrics (ig/ref ::sql-metrics)}
-   ::report                   (ig/ref ::test-results)})
+  {::db-connection             datastore
+   ::columns-metadata          {:db         (ig/ref ::db-connection)
+                                :table-name table-name}
+   ::columns-metadata-enriched {:columns (ig/ref ::columns-metadata)
+                                :metrics (:metrics options)}
+   ::sql-metrics               (assoc options
+                                      :db (ig/ref ::db-connection)
+                                      :columns-metadata (ig/ref ::columns-metadata-enriched))
+   ::calculated-metrics        {:columns     (ig/ref ::columns-metadata-enriched)
+                                :sql-metrics (ig/ref ::sql-metrics)}
+   ::test-results              {:metrics (ig/ref ::sql-metrics)
+                                :tests   options}
+   ::report                    (ig/ref ::test-results)})
 
 (defmethod ig/init-key ::db-connection
   [_ db]
@@ -30,12 +31,12 @@
   (info/get-columns-metadata db table-name))
 
 (defmethod ig/init-key ::columns-metadata-enriched
-  [_ columns-metadata]
-  (mapv m/enrich-column-metadata columns-metadata))
+  [_ {:keys [columns metrics]}]
+  (mapv #(m/enrich-column-metadata %  metrics) columns))
 
 (defmethod ig/init-key ::sql-metrics
-  [_ {:keys [db table-name columns-metadata metrics]}]
-  (m/get-metrics db table-name columns-metadata metrics))
+  [_ {:keys [db table-name columns-metadata]}]
+  (m/get-metrics db table-name columns-metadata))
 
 (defmethod ig/init-key ::test-results
   [_ {:keys [metrics tests]}]
