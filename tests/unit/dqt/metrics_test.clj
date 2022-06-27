@@ -75,12 +75,6 @@
   (testing "-values-count"
     (is (= (:values-count sut/metrics-fns) expressions/-values-count))))
 
-(deftest get-metric-values-from-result
-  (let [metrics {:count-my-column 25
-                 :variance-my-column 30}]
-    (is (= 25 (sut/get-count metrics "my-column")))
-    (is (= 30 (sut/get-variance metrics "my-column")))))
-
 (deftest calculated-metrics-test
   (let [columns     {:columns/calculated-metrics [:missing-count]
                      :columns/column-name        :my-column}

@@ -2,28 +2,8 @@
   (:require
    [camel-snake-kebab.core :as csk]
    [dqt.query-runner :as q]
-   [dqt.sql.expressions :as expressions]))
-
-(defn get-metric
-  "Get given `metric` value for `column-name` in `metrics`"
-  [metric metrics column-name]
-  (let [k  (keyword (format "%s-%s" metric (name column-name)))]
-    (k metrics)))
-
-(defn get-count
-  "Get count of `column-name` in `metrics`"
-  [metrics column-name]
-  (get-metric "count" metrics column-name))
-
-(defn get-variance
-  "Get variance of `column-name` in `metrics`"
-  [metrics column-name]
-  (get-metric "variance" metrics column-name))
-
-(defn -missing-count
-  [metrics column-name]
-  (- (:row-count metrics)
-     (get-count metrics column-name)))
+   [dqt.sql.expressions :as expressions]
+   [dqt.calculated-metrics :as cm]))
 
 (def metrics-fns
   "Map of metrics and functions"
@@ -40,7 +20,7 @@
    :min                expressions/-min
    :min-length         expressions/-min-length
    :mins               identity
-   :missing-count      -missing-count
+   :missing-count      cm/-missing-count
    :missing-percentage identity
    :row-count          [[:count :*] :row-count]
    :stddev             expressions/-stddev
