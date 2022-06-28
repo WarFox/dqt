@@ -28,7 +28,7 @@
   (testing "add sql-metrics and calculated metrics list to columns map"
     (is (= #:columns{:data-type          :integer
                      :sql-metrics        [:values-count :avg :max]
-                     :calculated-metrics '(:missing-count)}
+                     :calculated-metrics [:missing-percentage :missing-count :values-percentage]}
            (sut/enrich-column-metadata #:columns{:data-type :integer} [:avg :max])))))
 
 (deftest get-metrics-test
@@ -79,7 +79,7 @@
   (let [columns     {:columns/calculated-metrics [:missing-count]
                      :columns/column-name        :my-column}
         sql-metrics {:row-count 40 :count-my-column 38}]
-    (is (= {:row-count 40 :count-my-column 38 :missing-count-my-column 2}
+    (is (= {:missing-count-my-column 2}
            (sut/calculated-metrics columns sql-metrics)))))
 
 (deftest fields-test

@@ -18,8 +18,9 @@
                                       :columns-metadata (ig/ref ::columns-metadata-enriched))
    ::calculated-metrics        {:columns     (ig/ref ::columns-metadata-enriched)
                                 :sql-metrics (ig/ref ::sql-metrics)}
-   ::test-results              {:metrics (ig/ref ::sql-metrics)
-                                :tests   options}
+   ::test-results              {:sql-metrics        (ig/ref ::sql-metrics)
+                                :calculated-metrics (ig/ref ::calculated-metrics)
+                                :tests              (:tests options)}
    ::report                    (ig/ref ::test-results)})
 
 (defmethod ig/init-key ::db-connection
@@ -38,9 +39,14 @@
   [_ {:keys [db table-name columns-metadata]}]
   (m/get-metrics db table-name columns-metadata))
 
+(defmethod ig/init-key ::calculated-metrics
+  [_ {:keys [columns sql-metrics]}]
+  (into {} (map #(m/calculated-metrics % sql-metrics) columns)))
+
 (defmethod ig/init-key ::test-results
-  [_ {:keys [metrics tests]}]
-  (mapv #(c/run-check % metrics) (:tests tests)))
+  [_ {:keys [sql-metrics calculated-metrics tests]}]
+  (let [metrics (merge sql-metrics calculated-metrics)]
+    (mapv #(c/run-check % metrics) tests)))
 
 (defn- test-failed?
   [test-result]
@@ -52,11 +58,6 @@
     (println "Failed")
     (println "Success"))
   test-results)
-
-(defmethod ig/init-key ::calculated-metrics
-  [_ {:keys [columns sql-metrics]}]
-  (into {}
-        (map #(m/calculated-metrics % sql-metrics) columns)))
 
 (defn init
   "Initialise system"

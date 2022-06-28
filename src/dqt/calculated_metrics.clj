@@ -22,17 +22,17 @@
      (values-count metrics column-name)))
 
 (defn -missing-percentage
-  ;; missing count * 100 / row-count
+  "missing count * 100 / row-count"
   [metrics column-name]
   (/
-    (* 100
-       (-missing-count metrics column-name))
-    (:row-count metrics)))
+   (* 100
+      (-missing-count metrics column-name))
+   (:row-count metrics)))
 
 (defn -values-percentage
-  ;; values-count * 100 / row-count
+  "values-count * 100 / row-count"
   [metrics column-name]
   (/
-    (* 100
-       (values-count metrics column-name))
-    (:row-count metrics)))
+   (* 100
+      (values-count metrics column-name))
+   (:row-count metrics)))

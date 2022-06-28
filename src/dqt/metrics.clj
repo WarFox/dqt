@@ -1,9 +1,9 @@
 (ns dqt.metrics
   (:require
    [camel-snake-kebab.core :as csk]
+   [dqt.calculated-metrics :as cm]
    [dqt.query-runner :as q]
-   [dqt.sql.expressions :as expressions]
-   [dqt.calculated-metrics :as cm]))
+   [dqt.sql.expressions :as expressions]))
 
 (def metrics-fns
   "Map of metrics and functions"
@@ -21,7 +21,7 @@
    :min-length         expressions/-min-length
    :mins               identity
    :missing-count      cm/-missing-count
-   :missing-percentage identity
+   :missing-percentage cm/-missing-percentage
    :row-count          [[:count :*] :row-count]
    :stddev             expressions/-stddev
    :sum                expressions/-sum
@@ -30,7 +30,7 @@
    :valid-count        identity
    :valid-percentage   identity
    :values-count       expressions/-values-count
-   :values-percentage  identity
+   :values-percentage  cm/-values-percentage
    :variance           expressions/-variance})
 
 (def sql-metrics-group
@@ -44,7 +44,9 @@
 
 (def calculated-metrics-group
   "Calculated metrics grouped by data-type"
-  {:any [:missing-count]})
+  {:any [:values-percentage
+         :missing-count
+         :missing-percentage]})
 
 (defn- field-expression
   [metric-fns metric column-name]
@@ -87,16 +89,16 @@
                   (sql-metrics-map columns-metadata table-name)))
 
 (defn calculated-metrics
+  "Calculated metrics from sql-metrics"
   [{:keys [:columns/calculated-metrics :columns/column-name]} sql-metrics]
   (when (not-empty sql-metrics)
-    (merge sql-metrics
-           (into {}
-                 (map
-                  (fn new-metric
-                    [metric-name]
-                    (let [metric-fn   (metrics-fns metric-name)
-                          metric-name (format "%s-%s" (name metric-name) (name column-name))]
-                      (hash-map
-                       (csk/->kebab-case-keyword metric-name)
-                       (metric-fn sql-metrics column-name))))
-                  calculated-metrics)))))
+    (into {}
+          (map
+           (fn new-metric
+             [metric-name]
+             (let [metric-fn   (metrics-fns metric-name)
+                   metric-name (format "%s-%s" (name metric-name) (name column-name))]
+               (hash-map
+                (csk/->kebab-case-keyword metric-name)
+                (metric-fn sql-metrics column-name))))
+           calculated-metrics))))
