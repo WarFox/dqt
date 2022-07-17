@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -ex
+
+# export CLASSPATH=//.m2/repository/org/postgresql/postgresql/42.3.5/postgresql-42.3.5.jar
+# export CLASSPATH=/Users/WarFox/.m2/repository/org/postgresql/postgresql/42.3.5/postgresql-42.3.5.jar
+
+# java -cp ~/.m2/repository/org/postgresql/postgresql/42.3.5/postgresql-42.3.5.jar:./target/dqt-0.1.0-SNAPSHOT.jar dqt.core run -d examples/postgres.edn -t examples/tables/employees.edn
+# java -cp ./target/dqt-0.1.0-SNAPSHOT.jar dqt.core run -d examples/postgres.edn -t examples/tables/employees.edn
+# java -jar ./target/dqt-0.1.0-SNAPSHOT.jar run -d examples/postgres.edn -t examples/tables/employees.edn
+
+# java -cp ":./target/dqt-0.1.0-SNAPSHOT.jar" dqt.core run -d examples/postgres.edn -t examples/tables/employees.edn
+
+java -cp "/Users/WarFox/.m2/repository/org/postgresql/postgresql/42.3.5/postgresql-42.3.5.jar:./target/dqt-0.1.0-SNAPSHOT.jar" dqt.core run -d examples/postgres.edn -t examples/tables/employees.edn
