@@ -1,0 +1,8 @@
+{:dbtype     "postgresql"
+ :dbname     "postgres"
+ :host       #or [#env DATABASE_HOSTNAME "localhost"]
+ :user       "postgres"
+ :password   "postgres"
+ :ssl        false
+ :classname  "org.postgres.Driver"
+ :sslfactory "org.postgresql.ssl.NonValidatingFactory"}
