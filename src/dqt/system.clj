@@ -18,8 +18,10 @@
                                       :columns-metadata (ig/ref ::columns-metadata-enriched))
    ::calculated-metrics        {:columns     (ig/ref ::columns-metadata-enriched)
                                 :sql-metrics (ig/ref ::sql-metrics)}
+   ::validity-checks           {:columns (ig/ref ::columns-metadata-enriched)}
    ::test-results              {:sql-metrics        (ig/ref ::sql-metrics)
                                 :calculated-metrics (ig/ref ::calculated-metrics)
+                                :validity-checks    (ig/ref ::validity-checks)
                                 :tests              (:tests options)}
    ::report                    (ig/ref ::test-results)})
 
@@ -38,6 +40,11 @@
 (defmethod ig/init-key ::sql-metrics
   [_ {:keys [db table-name columns-metadata]}]
   (m/get-metrics db table-name columns-metadata))
+
+(defmethod ig/init-key ::validity-checks
+  [_ {:keys [columns]}]
+  (println "validity checks")
+  (println columns))
 
 (defmethod ig/init-key ::calculated-metrics
   [_ {:keys [columns sql-metrics]}]

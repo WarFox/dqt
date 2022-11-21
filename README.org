@@ -166,11 +166,11 @@ Run =docker compose up= to have postgress running
   bb test:watch
 #+end_src
 
-#+begin_src
+#+begin_src shell
   $ bin/koacha
 #+end_src
 
-#+begin_src
+#+begin_src shell
   $ bin/koacha --watch
 #+end_src
 
