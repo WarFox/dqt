@@ -131,11 +131,21 @@ FIXME: listing of options this app accepts.
 
 ** Run
 
-#+begin_src
-clj -M:dev:run run -d datasource.edn -t tables/employees.edn
+#+begin_src shell
+  clj -M:dev:run run -d datasource.edn -t tables/employees.edn
+#+end_src
+
+#+begin_src shell
+  bb run-example
 #+end_src
 
 * Development
+
+** Run development mode with babashka
+
+#+begin_src shell
+ bb dev
+#+end_src
 
 ** Test database
 
@@ -143,14 +153,25 @@ Run =docker compose up= to have postgress running
 
 ** Run migraion
 
-#+begin_src
-  $ clj -X:dev:migrate
+#+begin_src shell
+  bb migrate
 #+end_src
 
 ** Run test
 
+#+begin_src shell
+  clj -M:dev:test
+  clj -M:dev:test --watch
+  bb test
+  bb test:watch
+#+end_src
+
 #+begin_src
-  $ clj -T:build test
+  $ bin/koacha
+#+end_src
+
+#+begin_src
+  $ bin/koacha --watch
 #+end_src
 
 * References
