@@ -4,12 +4,16 @@
    [next.jdbc :as jdbc]
    [next.jdbc.result-set :as rs]))
 
+(defn ->sql
+  [q]
+  (honey/format q))
+
 (defn execute!
   "Execute query and builds result set with keys in kebab case"
   ([db query]
    (execute! db query {}))
   ([db query opts]
-   (let [formatted-query (honey/format query)]
+   (let [formatted-query (->sql query)]
      (println formatted-query)
      (jdbc/execute! db formatted-query
                     (assoc opts
@@ -20,7 +24,7 @@
   ([db query]
    (execute-one! db query {}))
   ([db query opts]
-   (let [formatted-query (honey/format query)]
+   (let [formatted-query (->sql query)]
      (println formatted-query)
      (jdbc/execute-one! db formatted-query
                         (assoc opts

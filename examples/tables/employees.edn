@@ -1,0 +1,38 @@
+{:table-name :employees
+ :metrics    [:row-count
+              :missing-count
+              :missing-percentage
+              :values-count
+              :values-percentage
+              :invalid-count
+              :invalid-percentage
+              :valid-count
+              :valid-percentage
+              :avg-length
+              :max-length
+              :min-length
+              :avg
+              :sum
+              :max
+              :min
+              :stddev
+              :variance]
+
+ :tests      [[:row-count = 40]
+              [:avg-length-phone-number = 12]
+              [:stddev-salary > 4500]
+              [:sum-salary > 20000]
+              [:count-manager-id = 39]
+              [:missing-count-manager-id = 0]
+              [:missing-percentage-manager-id < 20]
+              [:values-percentage-manager-id < 30]
+              [:max-length-email <= 35]]
+
+ :columns    [:dob
+              {:valid-format :date
+               :tests
+               [[:invalid-percentage == 0]]}
+              :first-name
+              {:valid-format :number-percentage
+               :tests
+               [[:invalid-percentage == 0]]}]}
