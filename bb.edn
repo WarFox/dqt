@@ -1,0 +1,15 @@
+{:tasks {;; Used only in local development.
+         dev        {:doc  "Runs app in dev mode. Compiles cljs, less and runs JVM app in parallel."
+                     :task (run '-dev {:parallel true})}
+         -dev       {:depends [dev:docker test:watch]}
+         dev:docker {:doc  "Start docker with database"
+                     :task (shell "docker compose up")}
+
+         run-example {:dock "Run example"
+                      :task (clojure "-M:dev:run run -d examples/postgres.edn -t examples/tables/employees.edn")}
+
+         test       (clojure "-M:dev:test")
+         test:watch (clojure "-M:dev:test --watch")
+
+         migrate (clojure "-X:dev:migrate")
+         uberjar (clojure "-X:uberjar")}}
